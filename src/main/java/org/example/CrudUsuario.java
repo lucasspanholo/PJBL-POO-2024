@@ -1,17 +1,18 @@
 package org.example;
 
-import org.example.UsuarioDAO;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class CrudUsuario extends JFrame {
+public class CrudUsuario {
 
     private JTextField nomeField;
     private JTextField emailField;
+    private JTextField dataNascimentoField;
+    private JTextField enderecoField;
+    private JTextField telefoneField;
     private JButton btnCriar;
     private JButton btnEditar;
     private JButton btnDeletar;
@@ -21,11 +22,15 @@ public class CrudUsuario extends JFrame {
     private UsuarioDAO usuarioDAO;
 
     public CrudUsuario() {
-        super("CRUD de Usuário");
         usuarioDAO = new UsuarioDAO();
+
+        JFrame frame = new JFrame("CRUD de Usuário");
 
         nomeField = new JTextField(20);
         emailField = new JTextField(20);
+        dataNascimentoField = new JTextField(20);
+        enderecoField = new JTextField(20);
+        telefoneField = new JTextField(20);
 
         btnCriar = new JButton("Criar");
         btnEditar = new JButton("Editar");
@@ -72,6 +77,21 @@ public class CrudUsuario extends JFrame {
         inputPanel.add(new JLabel("Email:"), gbc);
         gbc.gridx++;
         inputPanel.add(emailField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        inputPanel.add(new JLabel("Data de Nascimento:"), gbc);
+        gbc.gridx++;
+        inputPanel.add(dataNascimentoField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        inputPanel.add(new JLabel("Endereço:"), gbc);
+        gbc.gridx++;
+        inputPanel.add(enderecoField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        inputPanel.add(new JLabel("Telefone:"), gbc);
+        gbc.gridx++;
+        inputPanel.add(telefoneField, gbc);
         gbc.gridx++;
         gbc.gridy++;
         gbc.gridx = 0;
@@ -89,27 +109,38 @@ public class CrudUsuario extends JFrame {
         mainPanel.add(inputPanel, BorderLayout.NORTH);
         mainPanel.add(listPanel, BorderLayout.CENTER);
 
-        add(mainPanel);
+        frame.add(mainPanel);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
 
         refreshUsuarioList();
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
-        setVisible(true);
     }
 
     private void refreshUsuarioList() {
         List<Usuario> usuarios = usuarioDAO.listarUsuarios();
         listModel.clear();
         for (Usuario usuario : usuarios) {
-            listModel.addElement(usuario.getNome() + " - " + usuario.getEmail());
+            listModel.addElement(
+                    String.format("%s - %s - %s - %s - %s",
+                            usuario.getNome(),
+                            usuario.getEmail(),
+                            usuario.getDataNascimento(),
+                            usuario.getEndereco(),
+                            usuario.getTelefone()
+                    )
+            );
         }
     }
 
     private void criarUsuario() {
         String nome = nomeField.getText();
         String email = emailField.getText();
-        Usuario usuario = new Usuario(0, nome, email);
+        String dataNascimento = dataNascimentoField.getText();
+        String endereco = enderecoField.getText();
+        String telefone = telefoneField.getText();
+        Usuario usuario = new Usuario(0, nome, email, dataNascimento, endereco, telefone);
         usuarioDAO.criarUsuario(usuario);
         refreshUsuarioList();
     }
@@ -120,12 +151,18 @@ public class CrudUsuario extends JFrame {
             Usuario usuario = usuarioDAO.listarUsuarios().get(selectedIndex);
             String nome = nomeField.getText();
             String email = emailField.getText();
+            String dataNascimento = dataNascimentoField.getText();
+            String endereco = enderecoField.getText();
+            String telefone = telefoneField.getText();
             usuario.setNome(nome);
             usuario.setEmail(email);
+            usuario.setDataNascimento(dataNascimento);
+            usuario.setEndereco(endereco);
+            usuario.setTelefone(telefone);
             usuarioDAO.atualizarUsuario(usuario);
             refreshUsuarioList();
         } else {
-            JOptionPane.showMessageDialog(this, "Selecione um usuário para editar.");
+            JOptionPane.showMessageDialog(null, "Selecione um usuário para editar.");
         }
     }
 
@@ -136,7 +173,7 @@ public class CrudUsuario extends JFrame {
             usuarioDAO.deletarUsuario(usuario.getId());
             refreshUsuarioList();
         } else {
-            JOptionPane.showMessageDialog(this, "Selecione um usuário para deletar.");
+            JOptionPane.showMessageDialog(null, "Selecione um usuário para deletar.");
         }
     }
 
